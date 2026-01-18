@@ -492,155 +492,105 @@ function printPage(pageId) {
 </script>
 
 <script>
-/* ================= BACKUP ================= */
-function backupData() {
-    const backup = {};
-    
-    // Only backup our report data
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith("report-")) {
-            backup[key] = localStorage.getItem(key);
-        }
-    }
-
-    const blob = new Blob(
-        [JSON.stringify(backup, null, 2)],
-        { type: "application/json" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "church-finance-backup.json";
-    a.click();
-
-    URL.revokeObjectURL(url);
-}
-
-/* ================= RESTORE ================= */
-function restoreData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!confirm("This will overwrite existing data. Continue?")) {
-        event.target.value = "";
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-
-            // Restore only report data
-            Object.keys(data).forEach(key => {
-                if (key.startsWith("report-")) {
-                    localStorage.setItem(key, data[key]);
-                }
-            });
-
-            alert("Data restored successfully. Reloading page…");
-            location.reload();
-        } catch (err) {
-            alert("Invalid backup file.");
-        }
-    };
-    reader.readAsText(file);
-
-    event.target.value = "";
-}
-</script>
-
-<script>
-const CLIENT_ID = "27784823910-fe3v3lvpm66aifaa5kmhb3egnnn3j73j.apps.googleusercontent.com";
+const CLIENT_ID = "YOUR_CLIENT_ID_HERE";
 const SCOPES = "https://www.googleapis.com/auth/drive.appdata";
 
 let accessToken = null;
 
-/* ---------- GOOGLE SIGN IN ---------- */
+/* ---------- SIGN IN ---------- */
 document.getElementById("googleSignInBtn").onclick = () => {
     google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
-        callback: tokenResponse => {
-            accessToken = tokenResponse.access_token;
-            alert("Signed in successfully!");
-            document.getElementById("backupBtn").disabled = false;
-            document.getElementById("restoreBtn").disabled = false;
+        callback: t => {
+            accessToken = t.access_token;
+            alert("Signed in with Google");
+            backupBtn.disabled = false;
+            restoreBtn.disabled = false;
         }
     }).requestAccessToken();
 };
 
+/* ---------- GET BACKUP FILE ID ---------- */
+async function getBackupFileId() {
+    const res = await fetch(
+        "https://www.googleapis.com/drive/v3/files?q=name='church-finance-backup.json'&spaces=appDataFolder",
+        { headers: { Authorization: "Bearer " + accessToken } }
+    );
+    const data = await res.json();
+    return data.files?.[0]?.id || null;
+}
+
 /* ---------- BACKUP ---------- */
 async function backupToDrive() {
-    if (!accessToken) return alert("Please sign in first.");
+    if (!accessToken) return alert("Sign in first");
 
     const backup = {};
     for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith("report-")) {
-            backup[key] = localStorage.getItem(key);
+        const k = localStorage.key(i);
+        if (k.startsWith("report-")) {
+            backup[k] = localStorage.getItem(k);
         }
     }
 
-    const metadata = {
-        name: "church-finance-backup.json",
-        parents: ["appDataFolder"]
-    };
+    const fileId = await getBackupFileId();
+    const method = fileId ? "PATCH" : "POST";
+    const url = fileId
+        ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`
+        : "https://www.googleapis.com/upload/drive/v3/files?uploadType=media";
 
-    const boundary = "-------314159265358979323846";
-    const body =
-        `--${boundary}\r\n` +
-        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
-        JSON.stringify(metadata) + `\r\n` +
-        `--${boundary}\r\n` +
-        `Content-Type: application/json\r\n\r\n` +
-        JSON.stringify(backup) + `\r\n` +
-        `--${boundary}--`;
+    const metaUrl = fileId
+        ? null
+        : "https://www.googleapis.com/drive/v3/files";
 
-    await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-        method: "POST",
+    if (!fileId) {
+        await fetch(metaUrl, {
+            method: "POST",
+            headers: {
+                Authorization: "Bearer " + accessToken,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: "church-finance-backup.json",
+                parents: ["appDataFolder"]
+            })
+        });
+    }
+
+    await fetch(url, {
+        method,
         headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "multipart/related; boundary=" + boundary
+            Authorization: "Bearer " + accessToken,
+            "Content-Type": "application/json"
         },
-        body
+        body: JSON.stringify(backup)
     });
 
-    alert("Backup uploaded to Google Drive.");
+    alert("Backup successfully saved to Google Drive");
 }
 
 /* ---------- RESTORE ---------- */
 async function restoreFromDrive() {
-    if (!accessToken) return alert("Please sign in first.");
+    if (!accessToken) return alert("Sign in first");
 
-    const list = await fetch(
-        "https://www.googleapis.com/drive/v3/files?q=name='church-finance-backup.json'&spaces=appDataFolder",
-        { headers: { "Authorization": "Bearer " + accessToken } }
-    ).then(r => r.json());
+    const fileId = await getBackupFileId();
+    if (!fileId) return alert("No backup found in Drive");
 
-    if (!list.files || !list.files.length) {
-        alert("No backup found in Drive.");
-        return;
-    }
+    if (!confirm("This will overwrite current data. Continue?")) return;
 
-    const fileId = list.files[0].id;
-    const content = await fetch(
+    const res = await fetch(
         `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-        { headers: { "Authorization": "Bearer " + accessToken } }
-    ).then(r => r.json());
+        { headers: { Authorization: "Bearer " + accessToken } }
+    );
+    const data = await res.json();
 
-    if (!confirm("Restore will overwrite current data. Continue?")) return;
-
-    Object.keys(content).forEach(k => {
-        localStorage.setItem(k, content[k]);
-    });
-
-    alert("Data restored. Reloading…");
+    Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+    alert("Restore complete. Reloading…");
     location.reload();
 }
 </script>
 
+
 </body>
 </html>
+
