@@ -110,37 +110,38 @@ button {
     button {
         display: none !important;
     }
-
-}
-.backup-bar {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px;
-    background: #f9f9f9;
-    border-bottom: 1px solid #ccc;
-}
-
-.restore-btn {
-    background: #e67e22;
-    color: #fff;
-    padding: 6px 10px;
-    cursor: pointer;
-    border-radius: 3px;
-}
-
-.backup-bar button {
-    background: #27ae60;
-    color: #fff;
-    border: none;
-    padding: 6px 10px;
-    cursor: pointer;
-}
-
 @media print {
-    .backup-bar {
-        display: none !important;
+    body {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
+
+    .watermark {
+        opacity: 0.06; /* lighter for paper */
+    }
+
+}
+
+.watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    height: 400px;
+    background: url("logo.png") no-repeat center center;
+    background-size: contain;
+    opacity: 0.08; /* 🔥 adjust here */
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Ensure content stays above watermark */
+.header,
+.nav,
+.content {
+    position: relative;
+    z-index: 1;
 }
 
 </style>
@@ -148,18 +149,11 @@ button {
 
 <body>
 
+<div class="watermark"></div>
+
 <div class="header">
     <h2>BLESSED HOUSE OF WORSHIP INTERNATIONAL INC.</h2>
     <p>Cagayan–Apayao District · Finance Dashboard</p>
-</div>
-
-<div class="backup-bar">
-    <button onclick="backupData()">💾 Backup Data</button>
-
-    <label class="restore-btn">
-        ♻️ Restore Data
-        <input type="file" accept=".json" onchange="restoreData(event)" hidden>
-    </label>
 </div>
 
 <div class="nav">
@@ -460,67 +454,6 @@ function printPage(pageId) {
     document.querySelectorAll('.page').forEach(p => {
         p.style.display = '';
     });
-}
-</script>
-
-<script>
-/* ================= BACKUP ================= */
-function backupData() {
-    const backup = {};
-    
-    // Only backup our report data
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith("report-")) {
-            backup[key] = localStorage.getItem(key);
-        }
-    }
-
-    const blob = new Blob(
-        [JSON.stringify(backup, null, 2)],
-        { type: "application/json" }
-    );
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "church-finance-backup.json";
-    a.click();
-
-    URL.revokeObjectURL(url);
-}
-
-/* ================= RESTORE ================= */
-function restoreData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!confirm("This will overwrite existing data. Continue?")) {
-        event.target.value = "";
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = JSON.parse(e.target.result);
-
-            // Restore only report data
-            Object.keys(data).forEach(key => {
-                if (key.startsWith("report-")) {
-                    localStorage.setItem(key, data[key]);
-                }
-            });
-
-            alert("Data restored successfully. Reloading page…");
-            location.reload();
-        } catch (err) {
-            alert("Invalid backup file.");
-        }
-    };
-    reader.readAsText(file);
-
-    event.target.value = "";
 }
 </script>
 
