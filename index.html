@@ -164,6 +164,34 @@ button {
     }
 }
 
+.signin-notice {
+  background: #fff8e1;
+  border: 1px solid #e0c97f;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.signin-btn {
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.signin-btn:hover {
+  background: #1558b0;
+}
+
+.small-note {
+  font-size: 12px;
+  color: #555;
+  margin-top: 8px;
+}
 
 </style>
 </head>
@@ -175,6 +203,19 @@ button {
 <div class="header">
     <h2>BLESSED HOUSE OF WORSHIP INTERNATIONAL INC.</h2>
     <p>District · Finance Dashboard</p>
+</div>
+
+<div id="signinNotice" class="signin-notice">
+  <strong>Google Sign-In Required</strong><br>
+  To backup or restore data, please sign in using your browser.<br><br>
+
+  <button onclick="openBrowserSignIn()" class="signin-btn">
+    🌐 Open Browser to Sign In
+  </button>
+
+  <p class="small-note">
+    (This app works offline. Internet is only needed for backup & restore.)
+  </p>
 </div>
 
 <div class="backup-bar">
@@ -471,7 +512,32 @@ aName.onchange = buildArea;
 
 loadAreaNames();
 buildArea();
+
+function openBrowserSignIn() {
+  const redirect = encodeURIComponent(window.location.href);
+
+  const authUrl =
+    "https://accounts.google.com/o/oauth2/v2/auth" +
+    "?client_id=" + CLIENT_ID +
+    "&redirect_uri=" + redirect +
+    "&response_type=token" +
+    "&scope=https://www.googleapis.com/auth/drive.file" +
+    "&prompt=select_account";
+
+  window.open(authUrl, "_blank");
+}
+
+function isPWA() {
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+}
+
+if (!isPWA()) {
+  document.getElementById("signinNotice").style.display = "none";
+}
+
 </script>
+	
 <script>
 function printPage(pageId) {
     // Hide all pages
@@ -652,6 +718,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
