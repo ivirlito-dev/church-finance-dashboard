@@ -277,7 +277,8 @@ input, select, textarea, button {
   font-size: 16px !important;
 }
 
-/* ===== YEARLY TABLE MOBILE FIX ===== */
+/* ===== YEARLY TABLE FIX (NO OVERLAP) ===== */
+
 .table-scroll {
   width: 100%;
   overflow-x: auto;
@@ -285,23 +286,26 @@ input, select, textarea, button {
 }
 
 #yearlyTable {
-  width: max-content;        /* allows natural width */
-  min-width: 100%;
   border-collapse: collapse;
+  width: max-content;        /* DO NOT use 100% */
+  min-width: 100%;
 }
 
 #yearlyTable th,
 #yearlyTable td {
-  min-width: 90px;           /* prevents squishing */
-  padding: 6px 8px;
-  white-space: nowrap;       /* keeps headers readable */
+  box-sizing: border-box;
+  min-width: 120px;          /* 🔴 MUST be large enough */
+  padding: 8px;
   text-align: center;
+  white-space: normal;       /* allow wrapping */
+  word-break: break-word;    /* prevent overlap */
+  font-size: 13px;           /* reduce slightly */
 }
 
-/* First column (Month) wider */
+/* Month column */
 #yearlyTable th:first-child,
 #yearlyTable td:first-child {
-  min-width: 110px;
+  min-width: 130px;
   text-align: left;
   font-weight: bold;
 }
@@ -851,6 +855,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
