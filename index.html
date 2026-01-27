@@ -332,19 +332,6 @@ input, select, textarea, button {
     <p>District · Finance Dashboard</p>
 </div>
 
-<div id="signinNotice" class="signin-notice">
-  <strong>Google Sign-In Required</strong><br>
-  To backup or restore data, please sign in using your browser.<br><br>
-
-  <button onclick="openBrowserSignIn()" class="signin-btn">
-    🌐 Open Browser to Sign In
-  </button>
-
-  <p class="small-note">
-    (This app works offline. Internet is only needed for backup & restore.)
-  </p>
-</div>
-
 <div class="backup-bar">
     <button id="googleSignInBtn">🔐 Sign in with Google</button>
     <button onclick="backupToDrive()" disabled id="backupBtn">☁️ Backup to Drive</button>
@@ -855,6 +842,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
