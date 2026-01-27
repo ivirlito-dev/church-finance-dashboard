@@ -231,7 +231,13 @@ button {
 }
 
 .table-wrap table {
-  min-width: 600px; /* keeps columns readable */
+  width: 100%;
+  min-width: unset;   /* IMPORTANT */
+}
+	
+.header {
+  word-wrap: break-word;
+  text-align: center;
 }
 	
 </style>
@@ -767,6 +773,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
