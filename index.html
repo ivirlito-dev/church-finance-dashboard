@@ -194,6 +194,35 @@ button {
   margin-top: 8px;
 }
 
+/* MOBILE FIX */
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.content,
+.container,
+table {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Prevent tables from forcing zoom */
+table {
+  table-layout: fixed;
+}
+
+/* Inputs fit mobile */
+input,
+select,
+button {
+  font-size: 16px; /* prevents mobile zoom on focus */
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 </style>
 </head>
 
@@ -719,6 +748,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
