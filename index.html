@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta charset="UTF-8">
 <title>Church Finance Dashboard</title>
@@ -222,7 +224,16 @@ button {
   max-width: 100%;
   box-sizing: border-box;
 }
+	
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
 
+.table-wrap table {
+  min-width: 600px; /* keeps columns readable */
+}
+	
 </style>
 </head>
 
@@ -286,6 +297,7 @@ button {
 <label>Year:</label>
 <input type="number" id="monthlyYear" value="2026">
 
+<div class="table-wrap">
 <table>
 <thead>
 <tr><th>Area</th><th>10%</th></tr>
@@ -298,11 +310,13 @@ button {
 </tr>
 </tfoot>
 </table>
+</div>
 
 <button onclick="addMonthlyArea()">➕ Add Area</button>
 
 <h3>Expenses</h3>
 
+<div class="table-wrap">
 <table>
 <thead>
 <tr><th>Description</th><th>Amount</th></tr>
@@ -315,6 +329,7 @@ button {
 </tr>
 </tfoot>
 </table>
+</div>
 
 <button onclick="addMonthlyExpense()">➕ Add Expense</button>
 
@@ -335,8 +350,10 @@ button {
 <label>Year:</label>
 <select id="yearlyYear"></select>
 
+<div class="table-wrap">
 <table id="yearlyTable"></table>
-
+</div>
+	
 </div>
 
 <!-- ================= AREA ================= -->
@@ -354,8 +371,10 @@ button {
 <label>Area:</label>
 <select id="areaName"></select>
 
+<div class="table-wrap">	
 <table id="areaTable"></table>
-
+</div>
+	
 </div>
 
 </div>
@@ -748,6 +767,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
