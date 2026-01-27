@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta charset="UTF-8">
 <title>Church Finance Dashboard</title>
 <link rel="manifest" href="manifest.json">
@@ -239,7 +239,44 @@ button {
   word-wrap: break-word;
   text-align: center;
 }
-	
+
+/* ===== HARD MOBILE RESET ===== */
+html, body {
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Kill all fixed-width containers */
+* {
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
+/* Tables must never force scaling */
+table {
+  width: 100% !important;
+  max-width: 100% !important;
+  table-layout: fixed !important;
+}
+
+/* Wrap wide tables safely */
+.table-wrap {
+  width: 100% !important;
+  overflow-x: auto !important;
+}
+
+.table-wrap table {
+  min-width: unset !important;
+}
+
+/* Prevent Android input zoom */
+input, select, textarea, button {
+  font-size: 16px !important;
+}
+
 </style>
 </head>
 
@@ -773,6 +810,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
