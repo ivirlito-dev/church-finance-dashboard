@@ -277,6 +277,45 @@ input, select, textarea, button {
   font-size: 16px !important;
 }
 
+/* ===== YEARLY TABLE MOBILE FIX ===== */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#yearlyTable {
+  width: max-content;        /* allows natural width */
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+#yearlyTable th,
+#yearlyTable td {
+  min-width: 90px;           /* prevents squishing */
+  padding: 6px 8px;
+  white-space: nowrap;       /* keeps headers readable */
+  text-align: center;
+}
+
+/* First column (Month) wider */
+#yearlyTable th:first-child,
+#yearlyTable td:first-child {
+  min-width: 110px;
+  text-align: left;
+  font-weight: bold;
+}
+
+@media print {
+  .table-scroll {
+    overflow: visible !important;
+  }
+
+  #yearlyTable {
+    width: 100% !important;
+  }
+}
+
 </style>
 </head>
 
@@ -393,7 +432,11 @@ input, select, textarea, button {
 <label>Year:</label>
 <select id="yearlyYear"></select>
 
-<table id="yearlyTable"></table>
+<div class="table-scroll">
+  <table id="yearlyTable">
+  </table>
+</div>
+
 	
 </div>
 
@@ -808,6 +851,7 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
 
 
 
